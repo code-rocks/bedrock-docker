@@ -1,0 +1,50 @@
+version: '3'
+services:
+  engine:
+    build: ./build/engine
+    stdin_open: true
+    tty : true
+    restart: always
+    volumes:            
+      - ./config/custom.php.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./www:/share/nginx/html
+    ports:
+      - "9000:9000"
+    environment:
+      PHP_FPM_USER: www-data
+      PHP_FPM_GROUP: www-data
+
+  server:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./config/site.template:/etc/nginx/conf.d/site.template
+      - ./www:/share/nginx/html
+    ports:
+      - "80:80"
+    environment:
+      - NGINX_HOST=docker-test.local
+      - NGINX_PORT=80
+    command: /bin/bash -c "envsubst < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+  
+  db:
+    image: mariadb:10.3
+    restart: always
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+
+  composer:
+    restart: 'no'
+    image: composer
+    command: install
+    volumes:
+      - ./www:/share/nginx/html
+
+  adminer:
+    image: adminer
+    restart: always 
+    ports:
+      - 8080:8080

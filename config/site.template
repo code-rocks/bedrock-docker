@@ -1,0 +1,23 @@
+server {
+    listen 80;
+    server_name ${NGINX_HOST};
+    root /share/nginx/html/web;
+    index index.php index.htm index.html;
+
+    # avant le rewrite 
+    #location ~ \.php$ {
+    
+    location / {
+        try_files $${DOLLAR}uri $${DOLLAR}uri/ /index.php?$${DOLLAR}args;
+        fastcgi_index index.php;
+        fastcgi_pass engine:9000;
+        fastcgi_param SCRIPT_FILENAME $${DOLLAR}document_root$${DOLLAR}fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+location ~* .(eot|otf|svg|ttf|woff|woff2)$ {
+  add_header Access-Control-Allow-Origin *;
+}
+
+
+}
