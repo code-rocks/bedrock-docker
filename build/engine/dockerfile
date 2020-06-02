@@ -26,7 +26,9 @@ RUN composer create-project roots/bedrock
 
 WORKDIR /share/script-docker
 COPY . /share/script-docker
-RUN chmod 777 /share/script-docker/start.sh
+RUN chmod +x /share/script-docker/migrate.sh
+
+WORKDIR /share/nginx/html
 
 # Lancement
 CMD /share/script-docker/start.sh

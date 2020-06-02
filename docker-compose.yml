@@ -1,9 +1,9 @@
 version: '3'
 services:
-  engine:
-    build: ./build/engine
-    stdin_open: true
-    tty : true
+  bedrock:
+    build: ./build/bedrock
+    image: bedrock
+    container_name: website-bedrock
     restart: always
     volumes:            
       - ./config/custom.php.ini:/usr/local/etc/php/conf.d/custom.ini
@@ -16,6 +16,7 @@ services:
 
   server:
     image: nginx:latest
+    container_name: website-nginx
     restart: always
     volumes:
       - ./config/site.template:/etc/nginx/conf.d/site.template
@@ -29,6 +30,7 @@ services:
   
   db:
     image: mariadb:10.3
+    container_name: website-db
     restart: always
     volumes:
       - ./mariadb:/var/lib/mysql
@@ -36,15 +38,9 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: database
 
-  composer:
-    restart: 'no'
-    image: composer
-    command: install
-    volumes:
-      - ./www:/share/nginx/html
-
   adminer:
     image: adminer
+    container_name: website-adminer
     restart: always 
     ports:
       - 8080:8080
